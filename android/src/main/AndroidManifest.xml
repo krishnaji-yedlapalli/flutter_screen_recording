@@ -4,4 +4,10 @@
     <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />l
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <application>
+
+        <service android:name="changjoopark.com.flutter_foreground_plugin.FlutterForegroundService" android:foregroundServiceType="mediaProjection"/>
+
+    </application>
 </manifest>
