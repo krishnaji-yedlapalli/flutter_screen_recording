@@ -47,6 +47,9 @@ class FlutterScreenRecordingPlugin(
     private lateinit var _result: MethodChannel.Result
 
     companion object {
+        var staticIntentData: Intent? = null
+        var staticResultCode = 0
+
         @JvmStatic
         fun registerWith(registrar: Registrar) {
             val channel = MethodChannel(registrar.messenger(), "flutter_screen_recording")
@@ -61,9 +64,16 @@ class FlutterScreenRecordingPlugin(
         if (requestCode == SCREEN_RECORD_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 //initMediaRecorder();
+                if(staticResultCode == 0 && staticIntentData == null) {
+                    mMediaProjection = mProjectionManager?.getMediaProjection(resultCode, data)
+                    staticResultCode =resultCode;
+                    staticIntentData = data;
+                }else{
+                    mMediaProjection = mProjectionManager?.getMediaProjection(staticResultCode, staticIntentData!!)
+                }
 
                 mMediaProjectionCallback = MediaProjectionCallback()
-                mMediaProjection = mProjectionManager?.getMediaProjection(resultCode, data)
+
                 mMediaProjection?.registerCallback(mMediaProjectionCallback, null)
                 mVirtualDisplay = createVirtualDisplay()
 
@@ -185,13 +195,20 @@ class FlutterScreenRecordingPlugin(
 
         } catch (e: IOException) {
             println("ERR");
-            Log.d("--INIT-RECORDER", e.message)
+            //Log.d("--INIT-RECORDER", e.message)
             println("Error startRecordScreen")
             println(e.message)
         }
-
-        val permissionIntent = mProjectionManager?.createScreenCaptureIntent()
-        ActivityCompat.startActivityForResult(registrar.activity(), permissionIntent!!, SCREEN_RECORD_REQUEST_CODE, null)
+        println("startRecordScreen staticIntentData $staticIntentData staticResultCode $staticResultCode")
+        if(staticIntentData==null){
+            val permissionIntent = mProjectionManager?.createScreenCaptureIntent()
+            ActivityCompat.startActivityForResult(registrar.activity(), permissionIntent!!, SCREEN_RECORD_REQUEST_CODE, null)
+        }else{
+            mMediaProjectionCallback = MediaProjectionCallback()
+            mMediaProjection = mProjectionManager?.getMediaProjection(staticResultCode, staticIntentData!!)
+            mMediaProjection?.registerCallback(mMediaProjectionCallback, null)
+            mVirtualDisplay = createVirtualDisplay()
+        }
 
     }
 
@@ -203,7 +220,7 @@ class FlutterScreenRecordingPlugin(
             println("stopRecordScreen success")
 
         } catch (e: Exception) {
-            Log.d("--INIT-RECORDER", e.message)
+            // Log.d("--INIT-RECORDER", e.message)
             println("stopRecordScreen error")
             println(e.message)
 

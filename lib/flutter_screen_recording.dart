@@ -7,7 +7,7 @@ import 'package:flutter_foreground_plugin/flutter_foreground_plugin.dart';
 
 class FlutterScreenRecording {
   static const MethodChannel _channel =
-      const MethodChannel('flutter_screen_recording');
+  const MethodChannel('flutter_screen_recording');
 
   /// Records the device screen, without audio, to a video file named
   /// [name].mp4 on the device.
@@ -28,9 +28,24 @@ class FlutterScreenRecording {
   /// are not multiples of ten. See the example project for code.
   static Future<bool> startRecordScreen(String name,
       {int width, int height,
-      String titleNotification,
-      String messageNotification}) async {
+        String titleNotification,
+        String messageNotification}) async {
     await _maybeStartFGS(titleNotification, messageNotification);
+    if( width == null || height == null) {
+      width = null;
+      height = null;
+    }
+    final bool start = await _channel.invokeMethod('startRecordScreen',
+        {"name": name, "audio": false, "width": width,
+          "height": height});
+    return start;
+  }
+
+  static Future<bool> startRecordScreenAgain(String name,
+      {int width, int height,
+        String titleNotification,
+        String messageNotification}) async {
+    // await _maybeStartFGS(titleNotification, messageNotification);
     if( width == null || height == null) {
       width = null;
       height = null;
@@ -53,7 +68,7 @@ class FlutterScreenRecording {
     }
     final bool start = await _channel
         .invokeMethod('startRecordScreen', {"name": name, "audio": true,
-    "width": width, "height": height});
+      "width": width, "height": height});
     return start;
   }
 
@@ -62,6 +77,11 @@ class FlutterScreenRecording {
     if (Platform.isAndroid) {
       await FlutterForegroundPlugin.stopForegroundService();
     }
+    return path;
+  }
+
+  static Future<String> stopRecordScreenKeepService() async {
+    final String path = await _channel.invokeMethod('stopRecordScreen');
     return path;
   }
 
