@@ -81,7 +81,7 @@ class FlutterScreenRecording {
   }
 
   static Future<String> stopRecordScreenKeepService() async {
-    final String path = await _channel.invokeMethod('stopRecordScreen');
+    final String path = await _channel.invokeMethod('stopRecordScreenKeepStatic');
     return path;
   }
 

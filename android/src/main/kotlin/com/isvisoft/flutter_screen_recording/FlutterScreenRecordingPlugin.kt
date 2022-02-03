@@ -109,10 +109,24 @@ class FlutterScreenRecordingPlugin(
                 result.success(false)
             }
 
-        } else if (call.method == "stopRecordScreen") {
+        } else if (call.method == "stopRecordScreenKeepStatic") {
             try {
                 if (mMediaRecorder != null) {
                     stopRecordScreen()
+                    result.success("${storePath}${videoName}.mp4")
+                } else {
+                    result.success("")
+                }
+            } catch (e: Exception) {
+                result.success("")
+            }
+
+        }else if (call.method == "stopRecordScreen") {
+            try {
+                if (mMediaRecorder != null) {
+                    stopRecordScreen()
+                    staticResultCode =0;
+                    staticIntentData = null;
                     result.success("${storePath}${videoName}.mp4")
                 } else {
                     result.success("")
