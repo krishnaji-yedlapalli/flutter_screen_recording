@@ -50,10 +50,16 @@ class FlutterScreenRecording {
       width = null;
       height = null;
     }
-    final bool start = await _channel.invokeMethod('startRecordScreen',
-        {"name": name, "audio": false, "width": width,
-          "height": height});
-    return start;
+
+    if(Platform.isAndroid) {
+      final bool start = await _channel.invokeMethod('startRecordScreen',
+          {"name": name, "audio": false, "width": width,
+            "height": height});
+      return start;
+    }else{
+      final bool start = await _channel.invokeMethod('startRecordScreenAgain', {"name": name, "audio": false});
+      return start;
+    }
   }
 
   /// Records the device screen, with audio, to a video file named
