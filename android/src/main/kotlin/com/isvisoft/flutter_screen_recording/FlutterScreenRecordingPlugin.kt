@@ -26,9 +26,9 @@ import android.graphics.Point
 
 
 class FlutterScreenRecordingPlugin(
-        private val registrar: Registrar
+    private val registrar: Registrar
 ) : MethodCallHandler,
-        PluginRegistry.ActivityResultListener {
+    PluginRegistry.ActivityResultListener {
 
     var mScreenDensity: Int = 0
     var mMediaRecorder: MediaRecorder? = null
@@ -59,13 +59,13 @@ class FlutterScreenRecordingPlugin(
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent): Boolean {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
 
         if (requestCode == SCREEN_RECORD_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 //initMediaRecorder();
                 if(staticResultCode == 0 && staticIntentData == null) {
-                    mMediaProjection = mProjectionManager?.getMediaProjection(resultCode, data)
+                    mMediaProjection = mProjectionManager?.getMediaProjection(resultCode, data!!)
                     staticResultCode =resultCode;
                     staticIntentData = data;
                 }else{
@@ -216,7 +216,7 @@ class FlutterScreenRecordingPlugin(
         println("startRecordScreen staticIntentData $staticIntentData staticResultCode $staticResultCode")
         if(staticIntentData==null){
             val permissionIntent = mProjectionManager?.createScreenCaptureIntent()
-            ActivityCompat.startActivityForResult(registrar.activity(), permissionIntent!!, SCREEN_RECORD_REQUEST_CODE, null)
+            ActivityCompat.startActivityForResult(registrar.activity()!!, permissionIntent!!, SCREEN_RECORD_REQUEST_CODE, null)
         }else{
             mMediaProjectionCallback = MediaProjectionCallback()
             mMediaProjection = mProjectionManager?.getMediaProjection(staticResultCode, staticIntentData!!)
@@ -256,7 +256,7 @@ class FlutterScreenRecordingPlugin(
         println("aaa" + mDisplayWidth.toString() + " " + mDisplayHeight);
 
         return mMediaProjection?.createVirtualDisplay("MainActivity", mDisplayWidth, mDisplayHeight, mScreenDensity,
-                DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR, mMediaRecorder?.getSurface(), null, null)
+            DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR, mMediaRecorder?.getSurface(), null, null)
     }
 
     private fun stopScreenSharing() {
